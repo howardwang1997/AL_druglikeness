@@ -1,6 +1,6 @@
 # activechem
 
-# requirments:
+# requirments
 conda:
 python=3.6
 cudatoolkit
@@ -13,14 +13,11 @@ torch=1.5.0
 torchvision=0.6.0
 scikit-learn=0.22.2
 
-
 pip:
 alipy=1.2.1
 descriptastorus=2.2.0.3
 
-
-# train or test methods:
-
+# train or test methods
 change directory to ./activechem/
 edit run.py on every site 'CHANGE HERE'
 run run.py with python
