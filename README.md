@@ -1,6 +1,6 @@
 # activechem
 # requirments
-conda:
+conda install
 python=3.6
 cudatoolkit
 cudnn
@@ -12,7 +12,7 @@ torch=1.5.0
 torchvision=0.6.0
 scikit-learn=0.22.2
 ****
-pip:
+pip install
 alipy=1.2.1
 descriptastorus=2.2.0.3
 
