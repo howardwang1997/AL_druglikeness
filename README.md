@@ -1,5 +1,4 @@
 # activechem
-
 # requirments
 conda:
 python=3.6
@@ -18,6 +17,6 @@ alipy=1.2.1
 descriptastorus=2.2.0.3
 
 # train or test methods
-change directory to ./activechem/
-edit run.py on every site 'CHANGE HERE'
-run run.py with python
+change directory to ./activechem/ \n
+edit run.py on every site 'CHANGE HERE' \n
+run run.py with python\n
