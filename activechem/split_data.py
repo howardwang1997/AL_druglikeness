@@ -24,7 +24,7 @@ def select(max, number):
         selected, useless = appendnum(selected, [], max)
     selected.sort()
     return selected
-
+ 
 
 def collect_the_rest(max, proceeded):
     last = []
