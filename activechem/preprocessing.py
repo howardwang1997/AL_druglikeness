@@ -2,7 +2,6 @@ from rdkit import Chem
 import numpy as np
 import pandas as pd
 import torch
-from descriptastorus.descriptors import rdDescriptors, rdNormalizedDescriptors
 
 
 # loading data
@@ -100,8 +99,8 @@ class descriptors:
         from rdkit.Chem import rdMolDescriptors
         ecfp = []
         for i in smi_list:
-            ecfp.append(list(rdMolDescriptors.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(i),
-                                                                       radius=6, nBits = 512).ToBitString()))
+            ecfp.append([int(j) for j in list(rdMolDescriptors.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(i),
+                                                                       radius=6, nBits = 512).ToBitString())])
         return ecfp
 
     def smiles_to_descriptors_list(smi_list):
@@ -275,9 +274,11 @@ class descriptors:
             df = calc.pandas(mols[i*3000 :])
             df.to_csv(path, index=False, mode='a')
 
+    # rdDescriptors
 
     def generate_rdDescriptors(mol, Normalized=True):
         smiles = Chem.MolToSmiles(mol, isomericSmiles=True) if type(mol) != str else mol
+        from descriptastorus.descriptors import rdDescriptors, rdNormalizedDescriptors
         if Normalized:
             generator = rdNormalizedDescriptors.RDKit2DNormalized()
             tors = generator.process(smiles)
@@ -285,6 +286,22 @@ class descriptors:
             generator = rdDescriptors.RDKit2D()
             tors = generator.process(smiles)
         return tors[1:]
+
+
+    def generate_rdDescriptorsSets(mols, Normalized=True):
+        from descriptastorus.descriptors import rdDescriptors, rdNormalizedDescriptors
+        if Normalized:
+            generator = rdNormalizedDescriptors.RDKit2DNormalized()
+        else:
+            generator = rdDescriptors.RDKit2D()
+
+        tors = []
+        for mol in mols:
+            smiles = Chem.MolToSmiles(mol, isomericSmiles=True) if type(mol) != str else mol
+            tors.append(generator.process(smiles)[1:])
+
+        return np.asarray(tors)
+
 
 # CNN
 class CNN:
@@ -344,6 +361,67 @@ class CNN:
 
     def matrix_save(self, smiles_list):
         matrix_list = torch.zeros([len(smiles_list),40,120], dtype=torch.int8)
+        for i in range(len(smiles_list)):
+            mol = smiles_list[i]
+            matrix = self.smiles_to_matrix(mol)
+            matrix_list[i] = matrix
+        # matrix_list = torch.tensor(matrix_list, dtype=torch.int8)
+        return matrix_list
+
+
+class ChiralCNN:
+    def __init__(self):
+        self.chars = \
+            ['N','C','I','R','H',
+             'O','S','P','V','5'
+             '1','2','3','4',')'
+             '(','/','-','O','=',
+             'N','+','@','\\','#'
+             '6','7','8','9','0',
+             ']','%','F','L','[',
+             '&','s','o','c','n']
+
+
+    def smiles_process(self, smiles):
+        #input a smiles string, return a np.array
+        smiles.replace('Cl', 'L')
+        smiles.replace('Br', 'R')
+        smiles.replace('@@', '&')
+    #     smiles.replace('=N', 'M')
+        smiles.replace('Si', 'V')
+        return smiles
+
+
+    def smiles_to_matrix(self, smiles):
+        matrix = np.zeros((40,len(smiles)),dtype=int)
+        smiles = self.smiles_process(smiles)
+        if len(smiles) > 260:
+            smiles = smiles[:260]
+            matrix = np.zeros((40,260))
+        for i in range(len(smiles)):
+            if smiles[i] == 'N':
+                matrix[0,i] = 1
+                matrix[20,i] = 1
+            elif smiles[i] == 'O':
+                matrix[5,i] = 1
+                matrix[18,i] = 1
+            else:
+                try:
+                    matrix[self.chars.index(smiles[i]),i] = 1
+                except ValueError:
+                    pass
+
+        #padding
+        width = matrix.shape[1]
+        left = int((260-width)/2)
+        right = 260 - width - left
+        matrix = np.pad(matrix,((0,0),(left,right)))
+        matrix = torch.tensor(matrix, dtype=torch.int8)
+        return matrix
+
+
+    def matrix_save(self, smiles_list):
+        matrix_list = torch.zeros([len(smiles_list),40,260], dtype=torch.int8)
         for i in range(len(smiles_list)):
             mol = smiles_list[i]
             matrix = self.smiles_to_matrix(mol)
