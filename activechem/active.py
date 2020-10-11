@@ -32,7 +32,7 @@ from math import sqrt
 
 import warnings
 warnings.filterwarnings('ignore')
-
+ 
 
 class TorchFold:
     def __init__(self, dataset, labels, testset, testlab, model, phase, path, stopping):
