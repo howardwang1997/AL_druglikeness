@@ -25,7 +25,7 @@ class QueryInstanceDistribution(BaseIndexQuery):
     The implement of uncertainty measure includes:
     1. Distance
     2. Cohn
-    3. Variance
+    3. Variance 
 
     The above measures need the probabilistic output of the model.
     There are 3 ways to select instances in the data set.

@@ -120,7 +120,7 @@ class AverageRecorder(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum/self.count
-
+       
 
 class NeuralNetwork:
     """

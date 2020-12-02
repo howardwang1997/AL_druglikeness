@@ -29,4 +29,3 @@ run train.py with python following with parameters:
 
 example:
 python train.py -d molecules.sdf -l labels.txt -s ./admet/ -r 0.3
-

@@ -48,7 +48,7 @@ def smiles_list_to_mols(smi):
 def smiles_list_to_sdf(smi,route):
     w = Chem.SDWriter(route)
     _write_sdf(smiles_list_to_mols(smi), writer=w)
-
+ 
 
 def get_repeated(tobe_counted, template):
     rep = 0
